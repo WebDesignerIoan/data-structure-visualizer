@@ -120,6 +120,11 @@ export class AVLTree {
      * the height imbalance on the left side.
      */
 
+    if (y.left === null) {
+      // safety check
+      return y;
+    }
+
     let x = y.left;
     let T2 = x.right;
 
@@ -158,6 +163,9 @@ export class AVLTree {
      * The rotation keeps the BST ordering while reducing
      * the height imbalance on the right side.
      */
+    if (x.right === null) {
+      return x;
+    }
 
     let y = x.right;
     let T2 = y.left;
@@ -175,11 +183,10 @@ export class AVLTree {
   }
 
   insert(value) {
-    const inserted = this.insertNode(this.root, value);
+    const result = this.insertNode(this.root, value);
 
-    if (inserted !== null) {
-      // if no duplicate found
-      this.root = inserted;
+    if (result.inserted) {
+      this.root = result.node;
       this.size++;
       return true;
     }
@@ -188,32 +195,54 @@ export class AVLTree {
   }
 
   insertNode(node, value) {
-    // Normal BST insertion
+    // Empty position found: create new node
     if (node === null) {
-      return new AVLNode(value);
+      return {
+        node: new AVLNode(value),
+        inserted: true,
+      };
     }
 
     if (value < node.value) {
-      node.left = this.insertNode(node.left, value);
+      const result = this.insertNode(node.left, value);
+
+      node.left = result.node;
+
+      // duplicate found below
+      if (!result.inserted) {
+        return result;
+      }
     } else if (value > node.value) {
-      node.right = this.insertNode(node.right, value);
+      const result = this.insertNode(node.right, value);
+
+      node.right = result.node;
+
+      // duplicate found below
+      if (!result.inserted) {
+        return result;
+      }
     } else {
-      // AVL tree does not allow duplicates
-      return null;
+      // Duplicate value
+      return {
+        node: node,
+        inserted: false,
+      };
     }
 
-    // Update height after insertion
+    // Update height before checking balance
     this.updateHeight(node);
 
-    // Check whether this node became unbalanced
-    let balance = this.getBalanceFactor(node);
+    // Check balance factor and perform rotation if needed
+    const newRoot = this.rebalance(node);
 
-    // Rebalance if necessary
-    return this.rebalance(node, value);
+    return {
+      node: newRoot,
+      inserted: true,
+    };
   }
 
-  rebalance(node, value) {
-    // value is used to determine what case (rr,rl etc.) we are in
+  rebalance(node) {
+    // The balance factors of the node and its children determine the rotation case.
     let balance = this.getBalanceFactor(node);
 
     /*
@@ -237,13 +266,15 @@ export class AVLTree {
      */
 
     if (balance > 1) {
-      // LL
-      if (value < node.left.value) {
+      // LL case:
+      // left subtree is also left-heavy or balanced
+      if (this.getBalanceFactor(node.left) >= 0) {
         return this.rotateRight(node);
       }
 
-      // LR
-      if (value > node.left.value) {
+      // LR case:
+      // left subtree is right-heavy
+      if (this.getBalanceFactor(node.left) < 0) {
         node.left = this.rotateLeft(node.left);
 
         return this.rotateRight(node);
@@ -271,13 +302,15 @@ export class AVLTree {
      */
 
     if (balance < -1) {
-      // RR
-      if (value > node.right.value) {
+      // RR case:
+      // right subtree is also right-heavy or balanced
+      if (this.getBalanceFactor(node.right) <= 0) {
         return this.rotateLeft(node);
       }
 
-      // RL
-      if (value < node.right.value) {
+      // RL case:
+      // right subtree is left-heavy
+      if (this.getBalanceFactor(node.right) > 0) {
         node.right = this.rotateRight(node.right);
 
         return this.rotateLeft(node);
@@ -286,5 +319,28 @@ export class AVLTree {
 
     // Already balanced
     return node;
+  }
+
+  /*
+   * Searches for a value in the AVL tree.
+   
+   AVL trees keep the same ordering property as binary search trees,
+   so searching works exactly the same way as in a normal BST.
+   The balancing rotations do not affect the search logic.
+   */
+  search(value) {
+    let current = this.root;
+
+    while (current !== null) {
+      if (value === current.value) {
+        return current;
+      } else if (value < current.value) {
+        current = current.left;
+      } else {
+        current = current.right;
+      }
+    }
+
+    return null;
   }
 }

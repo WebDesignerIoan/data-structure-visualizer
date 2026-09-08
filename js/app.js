@@ -1,15 +1,27 @@
 // Import the BST logic.
 import {BinarySearchTree} from "./trees/BinarySearchTree.js";
 
+// Import the AVL logic
+import {AVLTree} from "./trees/AVLTree.js";
+
 // Import the class responsible for drawing the tree.
 import {TreeRenderer} from "./visualizer/TreeRenderer.js";
 
-// Create one BST instance for the application.
-const tree = new BinarySearchTree();
+// The application works with one active tree instance.
+// It can be replaced with either a BST or AVL tree. (that is why we use let)
+let tree = new BinarySearchTree();
+
+// Get the tree type from index.html
+const treeType = document.getElementById("treeType");
 
 // Get the SVG element from index.html.
 const svg = document.getElementById("treeCanvas");
 
+/*
+ * The renderer only depends on the tree structure:
+ * value, left child and right child.
+ * Therefore it can visualize both BST and AVL trees.
+ */
 // Give that SVG element to the renderer.
 const renderer = new TreeRenderer(svg);
 
@@ -92,9 +104,11 @@ function searchValue() {
 }
 
 /*
- Removes a value from the BST and redraws the tree.
- The deletion logic is handled by the BinarySearchTree class;
- this function only connects the UI with the data structure.
+ * Removes a value from the current tree and redraws the visualization.
+ *
+ * The deletion logic is handled by the tree implementation
+ * (BinarySearchTree or AVLTree). This function only connects
+ * the UI with the data structure.
  */
 function deleteValue() {
   const value = Number(valueInput.value);
@@ -119,6 +133,20 @@ function deleteValue() {
   valueInput.focus();
 }
 
+// Tree type switching based on what is received from html
+
+function changeTreeType() {
+  if (treeType.value === "avl") {
+    tree = new AVLTree();
+  } else {
+    tree = new BinarySearchTree();
+  }
+
+  renderer.render(tree);
+
+  message.textContent = "Switched tree type";
+}
+
 // Run insertValue() when the Insert button is clicked.
 insertButton.addEventListener("click", insertValue);
 
@@ -140,5 +168,7 @@ valueInput.addEventListener("keydown", event => {
   }
 });
 
-// Draw the initial empty tree when the page first loads.
+// Run changeTreeType() when the selected tree type changes. (which also renders the tree)
+treeType.addEventListener("change", changeTreeType);
+// Draw the initial empty tree when the page first loads. - default
 renderer.render(tree);

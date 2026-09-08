@@ -194,3 +194,134 @@ test("updates size after insertion", () => {
 
   assert.equal(tree.size, 3);
 });
+
+// SEARCH TESTS FOR AVL
+
+test("search finds existing AVL value", () => {
+  const tree = new AVLTree();
+
+  tree.insert(30);
+  tree.insert(20);
+  tree.insert(10);
+
+  const node = tree.search(10);
+
+  assert.equal(node.value, 10);
+});
+
+test("search returns the correct node object", () => {
+  const tree = new AVLTree();
+
+  tree.insert(50);
+  tree.insert(30);
+  tree.insert(70);
+
+  const result = tree.search(30);
+
+  assert.equal(result.value, 30);
+  assert.equal(result, tree.root.left);
+});
+
+test("inserts and searches for values in AVL tree", () => {
+  const tree = new AVLTree();
+
+  tree.insert(50);
+  tree.insert(30);
+  tree.insert(70);
+
+  assert.equal(tree.search(50).value, 50);
+  assert.equal(tree.search(30).value, 30);
+  assert.equal(tree.search(70).value, 70);
+  assert.equal(tree.search(100), null);
+});
+
+// specific bug encountered test
+test("keeps all nodes after large RR rebalance", () => {
+  const tree = new AVLTree();
+
+  [55, 33, 77, 11, 44, 66, 88, 87, 99, 100].forEach(value => tree.insert(value));
+
+  assert.equal(tree.search(66).value, 66);
+  assert.equal(tree.search(87).value, 87);
+  assert.equal(tree.search(88).value, 88);
+  assert.equal(tree.search(99).value, 99);
+  assert.equal(tree.search(100).value, 100);
+});
+
+// BIG BUG FUNCTION AND TEST
+
+/*
+ * Recursively verifies that a tree satisfies the AVL balance condition.
+ *
+ * For every node in an AVL tree, the difference between the height of
+ * the left subtree and the height of the right subtree must be at most 1.
+ *
+ * The function returns the height of the current subtree so that parent
+ * nodes can also be checked recursively.
+ */
+function checkAVLBalance(node) {
+  if (node === null) {
+    return 0;
+  }
+
+  const leftHeight = checkAVLBalance(node.left);
+  const rightHeight = checkAVLBalance(node.right);
+
+  assert.ok(Math.abs(leftHeight - rightHeight) <= 1);
+
+  return 1 + Math.max(leftHeight, rightHeight);
+}
+
+/*
+ * Stress test for the AVL balancing property.
+ *
+ * Instead of checking only specific rotation examples (LL, RR, LR, RL),
+ * this test inserts many random values and verifies that the AVL invariant
+ * is maintained after a larger number of operations.
+ *
+ * This helps detect cases where multiple rotations happen in sequence
+ * and where a small example-based test might not reveal a problem.
+ */
+test("maintains AVL balance after random insertions", () => {
+  const tree = new AVLTree();
+
+  const values = new Set();
+
+  while (values.size < 100) {
+    values.add(Math.floor(Math.random() * 1000));
+  }
+
+  for (const value of values) {
+    tree.insert(value);
+  }
+
+  checkAVLBalance(tree.root);
+});
+
+/*
+ * Stress test to ensure that insertions do not lose nodes.
+ *
+ * AVL rotations change the structure of the tree, but every inserted value
+ * must remain reachable afterwards.
+ *
+ * This test is particularly useful for detecting incorrect pointer updates
+ * during rotations, where an entire subtree could accidentally become
+ * disconnected from the tree.
+ */
+test("handles random insertions without losing nodes", () => {
+  const tree = new AVLTree();
+
+  const values = new Set();
+
+  while (values.size < 100) {
+    values.add(Math.floor(Math.random() * 1000));
+  }
+
+  for (const value of values) {
+    tree.insert(value);
+  }
+
+  for (const value of values) {
+    assert.notEqual(tree.search(value), null);
+  }
+});
