@@ -13,13 +13,15 @@ const svg = document.getElementById("treeCanvas");
 // Give that SVG element to the renderer.
 const renderer = new TreeRenderer(svg);
 
-// Get references to the input, button and message area
+// Get references to the input, button (insert,search,delete) and message area
 // from index.html.
 const valueInput = document.getElementById("valueInput");
 
 const insertButton = document.getElementById("insertButton");
 
 const searchButton = document.getElementById("searchButton");
+
+const deleteButton = document.getElementById("deleteButton");
 
 const message = document.getElementById("message");
 
@@ -89,11 +91,42 @@ function searchValue() {
   valueInput.focus();
 }
 
+/*
+ Removes a value from the BST and redraws the tree.
+ The deletion logic is handled by the BinarySearchTree class;
+ this function only connects the UI with the data structure.
+ */
+function deleteValue() {
+  const value = Number(valueInput.value);
+
+  if (valueInput.value.trim() === "") {
+    message.textContent = "Please enter a value.";
+
+    return;
+  }
+
+  const deleted = tree.delete(value);
+
+  if (deleted) {
+    message.textContent = `Deleted ${value}`;
+
+    renderer.render(tree);
+  } else {
+    message.textContent = `${value} was not found`;
+  }
+
+  valueInput.value = "";
+  valueInput.focus();
+}
+
 // Run insertValue() when the Insert button is clicked.
 insertButton.addEventListener("click", insertValue);
 
 // Run searchValue() when the Search button is clicked
 searchButton.addEventListener("click", searchValue);
+
+// Run deleteValue() when the Delete button is clicked
+deleteButton.addEventListener("click", deleteValue);
 
 /*
  * Also allow Enter to insert a value.
