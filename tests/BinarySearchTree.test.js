@@ -86,3 +86,49 @@ test("returns false when deleting a value that does not exist", () => {
   assert.equal(tree.delete(99), false);
   assert.equal(tree.size, 1);
 });
+
+test("search returns the correct node object", () => {
+  const tree = new BinarySearchTree();
+
+  tree.insert(50);
+  tree.insert(30);
+  tree.insert(70);
+
+  const result = tree.search(30);
+
+  assert.equal(result.value, 30);
+  assert.equal(result, tree.root.left);
+});
+
+test("inserts nodes in the correct BST positions", () => {
+  const tree = new BinarySearchTree();
+
+  tree.insert(50);
+  tree.insert(30);
+  tree.insert(70);
+  tree.insert(20);
+  tree.insert(40);
+
+  assert.equal(tree.root.value, 50);
+
+  assert.equal(tree.root.left.value, 30);
+  assert.equal(tree.root.right.value, 70);
+
+  assert.equal(tree.root.left.left.value, 20);
+  assert.equal(tree.root.left.right.value, 40);
+});
+
+test("deletes root with two children", () => {
+  const tree = new BinarySearchTree();
+
+  tree.insert(50);
+  tree.insert(30);
+  tree.insert(70);
+  tree.insert(60);
+  tree.insert(80);
+
+  tree.delete(50);
+
+  assert.equal(tree.root.value, 60);
+  assert.equal(tree.size, 4);
+});

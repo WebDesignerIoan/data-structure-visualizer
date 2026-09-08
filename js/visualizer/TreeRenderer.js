@@ -19,7 +19,17 @@ export class TreeRenderer {
     this.svg.innerHTML = "";
   }
 
-  render(tree) {
+  /*
+   * Draws the current state of a tree on the SVG canvas.
+   *
+   * The method first calculates the position of each node using
+   * an in-order traversal, than draws the connections between nodes
+   * and, finally, draws the nodes themselves.
+   *
+   * highlightedNode is optional and is used to visually mark a
+   * specific node (for example, after a successful search).
+   */
+  render(tree, highlightedNode = null) {
     // Start with a clean SVG canvas.
     this.clear();
 
@@ -104,7 +114,11 @@ export class TreeRenderer {
 
     // Draw each node after the edges have been drawn.
     for (const [node, position] of positions) {
-      this.drawNode(node.value, position.x, position.y);
+      this.drawNode(node.value, position.x, position.y, node === highlightedNode);
+      /*
+      TreeNode objects are compared by reference.
+      Only the exact node returned by search() will be highlighted.
+       */
     }
   }
 
@@ -129,7 +143,8 @@ export class TreeRenderer {
     this.svg.appendChild(line);
   }
 
-  drawNode(value, x, y) {
+  drawNode(value, x, y, highlighted = false) {
+    // we also added highlighted that shows if the node is the node searched for (will be drawn different)
     // Create the circular part of the node.
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 
@@ -137,7 +152,7 @@ export class TreeRenderer {
     circle.setAttribute("cy", y);
     circle.setAttribute("r", this.nodeRadius);
 
-    circle.setAttribute("fill", "white");
+    circle.setAttribute("fill", highlighted ? "lightgreen" : "white"); // if the node is the searched for node
     circle.setAttribute("stroke", "#222");
     circle.setAttribute("stroke-width", "2");
 

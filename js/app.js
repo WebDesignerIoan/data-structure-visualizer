@@ -19,6 +19,8 @@ const valueInput = document.getElementById("valueInput");
 
 const insertButton = document.getElementById("insertButton");
 
+const searchButton = document.getElementById("searchButton");
+
 const message = document.getElementById("message");
 
 function insertValue() {
@@ -58,8 +60,40 @@ function insertValue() {
   valueInput.focus();
 }
 
+/*Function for the behaviour on the press of the searchValue button */
+function searchValue() {
+  const value = Number(valueInput.value);
+
+  if (valueInput.value.trim() === "") {
+    message.textContent = "Please enter a value.";
+
+    return;
+  }
+
+  // search() returns the actual TreeNode object if found.
+  // The renderer can then use this object to highlight it.
+  const foundNode = tree.search(value);
+
+  if (foundNode !== null) {
+    message.textContent = `Found ${value}`;
+
+    // Redraw the tree with the searched node highlighted.
+    renderer.render(tree, foundNode);
+  } else {
+    message.textContent = `${value} was not found`;
+
+    renderer.render(tree);
+  }
+
+  valueInput.value = "";
+  valueInput.focus();
+}
+
 // Run insertValue() when the Insert button is clicked.
 insertButton.addEventListener("click", insertValue);
+
+// Run searchValue() when the Search button is clicked
+searchButton.addEventListener("click", searchValue);
 
 /*
  * Also allow Enter to insert a value.
