@@ -4,11 +4,11 @@ export class TreeRenderer {
     this.svg = svgElement;
 
     // Radius used for each circular node.
-    this.nodeRadius = 22;
+    this.nodeRadius = 30;
 
     // Controls how far apart nodes are drawn.
     this.horizontalSpacing = 80;
-    this.verticalSpacing = 90;
+    this.verticalSpacing = 120;
 
     // Extra space around the outside of the tree.
     this.margin = 40;
@@ -114,7 +114,7 @@ export class TreeRenderer {
 
     // Draw each node after the edges have been drawn.
     for (const [node, position] of positions) {
-      this.drawNode(node.value, position.x, position.y, node === highlightedNode);
+      this.drawNode(node, position.x, position.y, node === highlightedNode, tree);
       /*
       TreeNode objects are compared by reference.
       Only the exact node returned by search() will be highlighted.
@@ -143,7 +143,7 @@ export class TreeRenderer {
     this.svg.appendChild(line);
   }
 
-  drawNode(value, x, y, highlighted = false) {
+  drawNode(node, x, y, highlighted = false, tree) {
     // we also added highlighted that shows if the node is the node searched for (will be drawn different)
     // Create the circular part of the node.
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -156,19 +156,52 @@ export class TreeRenderer {
     circle.setAttribute("stroke", "#222");
     circle.setAttribute("stroke-width", "2");
 
-    // Create the text displayed inside the node.
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    // Main value text
+    const valueText = document.createElementNS("http://www.w3.org/2000/svg", "text");
 
-    text.setAttribute("x", x);
-    text.setAttribute("y", y + 5);
+    valueText.setAttribute("x", x);
+    valueText.setAttribute("y", y - 5);
+    valueText.setAttribute("text-anchor", "middle");
 
-    // Centre the text horizontally.
-    text.setAttribute("text-anchor", "middle");
+    valueText.textContent = node.value;
+    valueText.setAttribute("fill", "black");
+    valueText.setAttribute("font-size", "20");
+    valueText.setAttribute("font-weight", "bold");
 
-    text.textContent = value;
+    // Add AVL information only if this is an AVL node
+    let heightText = null;
+    let balanceText = null;
 
-    // Add both the circle and its value to the SVG.
+    // AVL nodes contain height information.
+    // BST nodes do not, so only AVL trees display height and balance factor.
+    if (node.height !== undefined) {
+      heightText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+      heightText.setAttribute("x", x);
+      heightText.setAttribute("y", y + 12);
+      heightText.setAttribute("text-anchor", "middle");
+      heightText.setAttribute("fill", "black");
+      heightText.setAttribute("font-size", "12");
+
+      heightText.textContent = `h:${node.height}`;
+
+      balanceText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+      balanceText.setAttribute("x", x);
+      balanceText.setAttribute("y", y + 27);
+      balanceText.setAttribute("text-anchor", "middle");
+      balanceText.setAttribute("fill", "black");
+      balanceText.setAttribute("font-size", "12");
+
+      balanceText.textContent = `b:${tree.getBalanceFactor(node)}`;
+    }
+
     this.svg.appendChild(circle);
-    this.svg.appendChild(text);
+    this.svg.appendChild(valueText);
+
+    if (heightText !== null) {
+      this.svg.appendChild(heightText);
+      this.svg.appendChild(balanceText);
+    }
   }
 }
