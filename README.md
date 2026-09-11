@@ -12,6 +12,11 @@ The goal of the project is to make the differences between these structures easi
 
 ---
 
+## Demo
+
+Live version:
+https://webdesignerioan.github.io/data-structure-visualizer/
+
 # Features
 
 ## Interactive Visualizer
