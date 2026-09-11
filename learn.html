@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Learn Tree Structures</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body>
+    <main class="container">
+      <nav class="navigation">
+        <a href="index.html">Home</a>
+        <a href="learn.html">Learn</a>
+        <a href="visualizer.html">Visualizer</a>
+      </nav>
+
+      <h1>Learn the Tree Structures</h1>
+
+      <p>This page explains the tree structures used in the visualizer and how their main operations work.</p>
+
+      <section class="theory-section">
+        <h2>Binary Search Tree</h2>
+
+        <p>
+          A Binary Search Tree stores values according to the rule: smaller values go to the left subtree and larger
+          values go to the right subtree.
+        </p>
+
+        <pre>
+        50
+       /  \
+     30    70
+    / \    / \
+  20  40  60  80
+        </pre>
+
+        <!--
+        Loads a normal BST example in the visualizer.
+        The values are inserted in the order shown in the URL.
+        -->
+        <a class="example-button" href="visualizer.html?tree=bst&amp;values=50,30,70,20,40,60,80"> Try BST example </a>
+
+        <h3>Insert</h3>
+
+        <p>To insert a value, start at the root and compare the new value with the current node.</p>
+
+        <p>
+          If the value is smaller, move left. If it is larger, move right. Continue until an empty child position is
+          found.
+        </p>
+
+        <h3>Search</h3>
+
+        <p>
+          Searching uses the same comparisons. At each node, the BST ordering rule tells us which subtree can contain
+          the value.
+        </p>
+
+        <pre>
+Search for 40:
+
+50 → 40 is smaller → go left
+30 → 40 is larger  → go right
+40 → found
+        </pre>
+
+        <h3>Delete</h3>
+
+        <p>Deletion depends on how many children the node has:</p>
+
+        <p>
+          0 children → remove the node directly.<br />
+          1 child → replace the node with its child.<br />
+          2 children → replace its value with the in-order successor.
+        </p>
+
+        <p>The in-order successor is the smallest value in the right subtree.</p>
+      </section>
+      <section class="theory-section">
+        <h2>AVL Tree</h2>
+
+        <p>
+          An AVL tree is a Binary Search Tree that also keeps itself balanced. Each node stores its height, which is
+          used to calculate a balance factor.
+        </p>
+
+        <p>In this project, the balance factor is:</p>
+
+        <pre>
+      balance factor = height(left) - height(right)
+        </pre>
+
+        <p>A node is considered balanced when its balance factor is -1, 0 or 1.</p>
+
+        <h3>Why balancing is needed</h3>
+
+        <p>A normal BST can become very unbalanced if values are inserted in sorted order.</p>
+
+        <pre>
+      10
+        \
+         20
+           \
+            30
+              \
+               40
+        </pre>
+
+        <p>In this case, searching behaves more like searching through a linked list than through a balanced tree.</p>
+
+        <h3>Rotations</h3>
+
+        <p>AVL trees restore balance using rotations. There are four possible imbalance cases.</p>
+
+        <h4>LL case</h4>
+
+        <pre>
+      Before:              After:
+      
+          30                  20
+         /                   /  \
+        20                 10    30
+       /
+      10
+        </pre>
+
+        <p>The tree is left-heavy, so a single right rotation is used.</p>
+        <a class="example-button" href="visualizer.html?tree=avl&amp;values=30,20,10"> Try LL example </a>
+
+        <h4>RR case</h4>
+
+        <pre>
+      Before:              After:
+      
+      10                     20
+        \                   /  \
+         20               10    30
+           \
+            30
+        </pre>
+
+        <p>The tree is right-heavy, so a single left rotation is used.</p>
+
+        <a class="example-button" href="visualizer.html?tree=avl&amp;values=10,20,30"> Try RR example </a>
+
+        <h4>LR case</h4>
+
+        <pre>
+      Before:              After:
+      
+          30                  20
+         /                   /  \
+        10                 10    30
+          \
+           20
+        </pre>
+
+        <p>First rotate the left child to the left, then rotate the unbalanced node to the right.</p>
+
+        <a class="example-button" href="visualizer.html?tree=avl&amp;values=30,10,20"> Try LR example </a>
+
+        <h4>RL case</h4>
+
+        <pre>
+      Before:              After:
+      
+      10                     20
+        \                   /  \
+         30               10    30
+        /
+      20
+        </pre>
+
+        <p>First rotate the right child to the right, then rotate the unbalanced node to the left.</p>
+
+        <a class="example-button" href="visualizer.html?tree=avl&amp;values=10,30,20"> Try RL example </a>
+
+        <h3>Insert</h3>
+
+        <p>
+          Insertion begins like a normal BST insertion. While the recursive calls return toward the root, the height of
+          each node is updated and its balance factor is checked.
+        </p>
+
+        <p>If a node becomes unbalanced, one of the rotation cases above is used to restore the AVL property.</p>
+
+        <h3>Search</h3>
+
+        <p>
+          Search works exactly like in a normal BST because AVL rotations preserve the Binary Search Tree ordering
+          property.
+        </p>
+
+        <h3>Delete</h3>
+
+        <p>
+          Deletion first follows the normal BST deletion rules. After a node is removed, heights are updated while
+          returning through the recursive calls.
+        </p>
+
+        <p>If deletion causes a node to become unbalanced, the same rotation logic is used to restore balance.</p>
+      </section>
+      <section class="theory-section">
+        <h2>Treap</h2>
+
+        <p>A Treap combines two different tree properties:</p>
+
+        <p>
+          1. Binary Search Tree ordering by value.<br />
+          2. Max-heap ordering by priority.
+        </p>
+
+        <pre>
+      BST rule:
+      left.value &lt; node.value &lt; right.value
+      
+      Heap rule:
+      parent.priority &gt;= child.priority
+        </pre>
+
+        <p>
+          Each node receives a randomly generated priority when it is created. The values determine where nodes belong
+          according to the BST rule, while priorities influence the shape of the tree.
+        </p>
+
+        <h3>Example</h3>
+
+        <pre>
+             50 (p:90)
+            /         \
+       30 (p:70)    70 (p:60)
+        </pre>
+
+        <p>
+          The values satisfy the BST ordering rule, while the priorities satisfy the max-heap rule because each parent
+          has a priority greater than or equal to its children.
+        </p>
+
+        <!--
+        Treap priorities are randomly generated, so the exact
+        shape of this example may be different each time it is loaded.
+        -->
+        <a class="example-button" href="visualizer.html?tree=treap&amp;values=50,30,70,20,40,60,80">
+          Try Treap example
+        </a>
+
+        <p>
+          OBS: Because Treap priorities are generated randomly, the exact shape of this example may change each time it
+          is opened.
+        </p>
+
+        <h3>Insert</h3>
+
+        <p>
+          Insertion first works like a normal BST insertion. The new value is placed according to the BST ordering rule.
+        </p>
+
+        <p>After insertion, the priority of the new node is compared with the priority of its parent.</p>
+
+        <p>
+          If the child has a higher priority than the parent, the heap property is violated and a rotation is used to
+          move the child upward.
+        </p>
+
+        <pre>
+      Before rotation:
+      
+            50 (p:40)
+           /
+       30 (p:80)
+      
+      
+      After right rotation:
+      
+         30 (p:80)
+              \
+              50 (p:40)
+        </pre>
+
+        <p>The rotation keeps the BST ordering property while restoring the max-heap priority property.</p>
+
+        <h3>Search</h3>
+
+        <p>Search works exactly like in a normal Binary Search Tree.</p>
+
+        <p>
+          Priorities are not used when searching. They only influence the shape of the tree. Search direction is
+          determined entirely by comparing values.
+        </p>
+
+        <pre>
+      Search for 70:
+      
+      50 → 70 is larger → go right
+      70 → found
+        </pre>
+
+        <h3>Delete</h3>
+
+        <p>Searching for the node to delete again follows normal BST ordering.</p>
+
+        <p>A node with zero or one child can be removed directly.</p>
+
+        <p>
+          If the node has two children, the child with the higher priority is rotated upward. This moves the node we
+          want to delete one level downward while preserving the heap property.
+        </p>
+
+        <p>
+          The process continues until the target node has at most one child, after which it can be removed directly.
+        </p>
+
+        <pre>
+      Delete 50:
+      
+             50
+            /  \
+          30    70
+      
+      Higher-priority child moves up
+      using a rotation.
+      
+      The target node moves downward
+      until it can be removed.
+        </pre>
+
+        <h3>AVL vs Treap</h3>
+
+        <p>Both AVL trees and Treaps use rotations, but for different reasons:</p>
+
+        <pre>
+      AVL:
+      rotation → restore height balance
+      
+      Treap:
+      rotation → restore priority heap property
+        </pre>
+      </section>
+      <section class="theory-section">
+        <h2>Comparison</h2>
+
+        <p>
+          All three structures use the Binary Search Tree ordering rule, but they differ in how they control the shape
+          of the tree.
+        </p>
+
+        <table class="comparison-table">
+          <tr>
+            <th>Structure</th>
+            <th>Main rule</th>
+            <th>Balancing</th>
+            <th>Typical search</th>
+            <th>Worst-case search</th>
+          </tr>
+
+          <tr>
+            <td>BST</td>
+            <td>Left &lt; Node &lt; Right</td>
+            <td>None</td>
+            <td>O(log n)</td>
+            <td>O(n)</td>
+          </tr>
+
+          <tr>
+            <td>AVL</td>
+            <td>BST + balance factor</td>
+            <td>Height-based rotations</td>
+            <td>O(log n)</td>
+            <td>O(log n)</td>
+          </tr>
+
+          <tr>
+            <td>Treap</td>
+            <td>BST + heap priority</td>
+            <td>Priority-based rotations</td>
+            <td>Expected O(log n)</td>
+            <td>O(n)</td>
+          </tr>
+        </table>
+
+        <h3>Main idea</h3>
+
+        <pre>
+      BST   → no balancing
+      
+      AVL   → deterministic balancing using height
+      
+      Treap → randomized balancing using priority
+        </pre>
+      </section>
+    </main>
+  </body>
+</html>

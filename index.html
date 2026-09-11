@@ -4,40 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Data Structure Visualizer</title>
+    <title>Data Structure Explorer</title>
 
     <link rel="stylesheet" href="css/styles.css" />
   </head>
 
   <body>
     <main class="container">
-      <h1>Data Structure Visualizer</h1>
+      <h1>Data Structure Explorer</h1>
 
-      <p>Interactive visualization of binary search trees, AVL trees and Treaps.</p>
+      <p>
+        Learn how Binary Search Trees, AVL trees and Treaps work, then experiment with them using the interactive
+        visualizer.
+      </p>
 
-      <section class="controls">
-        <input id="valueInput" type="number" placeholder="Enter a value" />
+      <section class="home-options">
+        <a class="home-card" href="learn.html">
+          <h2>Learn the Theory</h2>
 
-        <label for="treeType"> Tree Type: </label>
+          <p>Review the rules and main operations of BSTs, AVL trees and Treaps.</p>
+        </a>
 
-        <select id="treeType">
-          <option value="bst">Binary Search Tree</option>
+        <a class="home-card" href="visualizer.html">
+          <h2>Open the Visualizer</h2>
 
-          <option value="avl">AVL Tree</option>
-        </select>
-
-        <button id="insertButton">Insert</button>
-        <button id="searchButton">Search</button>
-        <button id="deleteButton">Delete</button>
-      </section>
-
-      <p id="message"></p>
-
-      <section class="visualizer">
-        <svg id="treeCanvas"></svg>
+          <p>Insert, search and delete values and see how each tree changes.</p>
+        </a>
       </section>
     </main>
-
-    <script type="module" src="js/app.js"></script>
   </body>
 </html>

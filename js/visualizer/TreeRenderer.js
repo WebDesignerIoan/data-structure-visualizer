@@ -29,7 +29,15 @@ export class TreeRenderer {
    * highlightedNode is optional and is used to visually mark a
    * specific node (for example, after a successful search).
    */
-  render(tree, highlightedNode = null) {
+
+  render(tree, highlightedNode = null, visitedNodes = []) {
+    /*
+     Convert the search-path array into a Set.
+    
+     A Set lets us quickly check whether a specific node object was visited during the search.
+     */
+    const visitedSet = new Set(visitedNodes);
+
     // Start with a clean SVG canvas.
     this.clear();
 
@@ -114,7 +122,15 @@ export class TreeRenderer {
 
     // Draw each node after the edges have been drawn.
     for (const [node, position] of positions) {
-      this.drawNode(node, position.x, position.y, node === highlightedNode, tree);
+      /*
+        IMPORTANT!
+        Search state is temporary UI information.
+       
+        We do not store "visited" or "highlighted" inside the tree nodes
+        Instead, the renderer checks whether each node belongs to the
+        search path (visitedSet.has(node)) and whether it is the final node that was found (node === highlightedNode)
+       */
+      this.drawNode(node, position.x, position.y, tree, node === highlightedNode, visitedSet.has(node)); // we use last to check if found
       /*
       TreeNode objects are compared by reference.
       Only the exact node returned by search() will be highlighted.
@@ -143,7 +159,7 @@ export class TreeRenderer {
     this.svg.appendChild(line);
   }
 
-  drawNode(node, x, y, highlighted = false, tree) {
+  drawNode(node, x, y, tree, highlighted = false, visited = false) {
     // we also added highlighted that shows if the node is the node searched for (will be drawn different)
     // Create the circular part of the node.
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -152,7 +168,23 @@ export class TreeRenderer {
     circle.setAttribute("cy", y);
     circle.setAttribute("r", this.nodeRadius);
 
-    circle.setAttribute("fill", highlighted ? "lightgreen" : "white"); // if the node is the searched for node
+    /*
+     * NODE COLOURS: 
+      - Normal nodes are white.
+      - Nodes visited during a search are yellow.
+      - The node that was actually found is green.
+     */
+    let nodeColor = "white";
+
+    if (visited) {
+      nodeColor = "lightyellow";
+    }
+
+    if (highlighted) {
+      nodeColor = "lightgreen";
+    }
+
+    circle.setAttribute("fill", nodeColor);
     circle.setAttribute("stroke", "#222");
     circle.setAttribute("stroke-width", "2");
 
@@ -168,9 +200,10 @@ export class TreeRenderer {
     valueText.setAttribute("font-size", "20");
     valueText.setAttribute("font-weight", "bold");
 
-    // Add AVL information only if this is an AVL node
+    // Additional information displayed depending on tree type.
     let heightText = null;
     let balanceText = null;
+    let priorityText = null;
 
     // AVL nodes contain height information.
     // BST nodes do not, so only AVL trees display height and balance factor.
@@ -196,12 +229,29 @@ export class TreeRenderer {
       balanceText.textContent = `b:${tree.getBalanceFactor(node)}`;
     }
 
+    // Treap nodes contain priority information.
+    // BST and AVL nodes do not, so only Treaps display priority.
+    if (node.priority !== undefined) {
+      priorityText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+
+      priorityText.setAttribute("x", x);
+      priorityText.setAttribute("y", y + 15);
+      priorityText.setAttribute("text-anchor", "middle");
+      priorityText.setAttribute("fill", "black");
+      priorityText.setAttribute("font-size", "12");
+
+      priorityText.textContent = `p:${node.priority}`;
+    }
+
     this.svg.appendChild(circle);
     this.svg.appendChild(valueText);
 
     if (heightText !== null) {
       this.svg.appendChild(heightText);
       this.svg.appendChild(balanceText);
+    }
+    if (priorityText !== null) {
+      this.svg.appendChild(priorityText);
     }
   }
 }

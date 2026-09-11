@@ -210,7 +210,10 @@ export class AVLTree {
 
       // duplicate found below
       if (!result.inserted) {
-        return result;
+        return {
+          node: node,
+          inserted: false,
+        };
       }
     } else if (value > node.value) {
       const result = this.insertNode(node.right, value);
@@ -219,7 +222,10 @@ export class AVLTree {
 
       // duplicate found below
       if (!result.inserted) {
-        return result;
+        return {
+          node: node,
+          inserted: false,
+        };
       }
     } else {
       // Duplicate value
@@ -342,5 +348,130 @@ export class AVLTree {
     }
 
     return null;
+  }
+
+  // DELETION functionality functions
+  /*
+   * Finds the node with the smallest value in a subtree.
+   *
+   * Because this is a BST, the smallest value is always
+   * found by following left children until there are none.
+   */
+  findMin(node) {
+    let current = node;
+
+    while (current.left !== null) {
+      current = current.left;
+    }
+
+    return current;
+  }
+
+  // We delete (initiate the process) and also check (and validate) if we deleted anything
+  delete(value) {
+    const result = this.deleteNode(this.root, value);
+
+    // Deletion and rebalancing may change the root.
+    this.root = result.node;
+
+    if (result.deleted) {
+      this.size--;
+      return true;
+    }
+
+    return false;
+  }
+
+  deleteNode(node, value) {
+    // Value was not found.
+    if (node === null) {
+      return {
+        node: null,
+        deleted: false,
+      };
+    }
+
+    // Search for the value using normal BST ordering.
+    if (value < node.value) {
+      const result = this.deleteNode(node.left, value); // recursive call
+
+      node.left = result.node;
+      // once we got to this point, it means that after the recursive calls we still havent found the target, so we "abort"
+      // Nothing was deleted below, so keep this subtree unchanged.
+      if (!result.deleted) {
+        return {
+          node: node,
+          deleted: false,
+        };
+      }
+    } else if (value > node.value) {
+      const result = this.deleteNode(node.right, value); // recursive call
+
+      node.right = result.node;
+
+      // once we got to this point, it means that after the recursive calls we still havent found the target, so we "abort"
+      // Nothing was deleted below, so keep this subtree unchanged.
+      if (!result.deleted) {
+        return {
+          node: node,
+          deleted: false,
+        };
+      }
+    } else {
+      // after the recursive calls, we should get here if we find the target node
+      /*
+        node to delete has been found.
+      
+       Case 1: no left child.
+       The right child replaces the deleted node.
+       */
+      if (node.left === null) {
+        return {
+          node: node.right,
+          deleted: true,
+        };
+      }
+
+      /*
+       Case 2: no right child.
+       The left child replaces the deleted node.
+       */
+      if (node.right === null) {
+        return {
+          node: node.left,
+          deleted: true,
+        };
+      }
+
+      /*
+       * Case 3: two children.
+       *
+       Replace the value with the in-order successor:
+       the smallest value in the right subtree.
+       */
+      const successor = this.findMin(node.right);
+
+      node.value = successor.value;
+
+      // Remove the successor from its original position.
+      const result = this.deleteNode(node.right, successor.value);
+
+      node.right = result.node;
+    }
+
+    /*
+     Deletion may reduce the height of a subtree.
+    
+     While recursion returns towards the root, update each
+     ancestor's height and rebalance it if necessary.
+     */
+    this.updateHeight(node);
+
+    node = this.rebalance(node);
+
+    return {
+      node: node,
+      deleted: true,
+    };
   }
 }

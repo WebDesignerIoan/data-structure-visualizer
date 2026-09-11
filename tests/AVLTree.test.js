@@ -325,3 +325,80 @@ test("handles random insertions without losing nodes", () => {
     assert.notEqual(tree.search(value), null);
   }
 });
+
+// DELETE functionality TESTS
+
+test("deletes a leaf from AVL tree", () => {
+  const tree = new AVLTree();
+
+  tree.insert(20);
+  tree.insert(10);
+  tree.insert(30);
+
+  assert.equal(tree.delete(10), true);
+
+  assert.equal(tree.search(10), null);
+  assert.equal(tree.size, 2);
+});
+
+test("deletes a node with one child from AVL tree", () => {
+  const tree = new AVLTree();
+
+  tree.insert(30);
+  tree.insert(20);
+  tree.insert(40);
+  tree.insert(10);
+
+  assert.equal(tree.delete(20), true);
+
+  assert.equal(tree.search(20), null);
+  assert.equal(tree.size, 3);
+});
+
+test("deletes a node with two children from AVL tree", () => {
+  const tree = new AVLTree();
+
+  tree.insert(50);
+  tree.insert(30);
+  tree.insert(70);
+  tree.insert(60);
+  tree.insert(80);
+
+  assert.equal(tree.delete(70), true);
+
+  assert.equal(tree.search(70), null);
+  assert.equal(tree.size, 4);
+});
+
+test("returns false when deleting a missing AVL value", () => {
+  const tree = new AVLTree();
+
+  tree.insert(20);
+  tree.insert(10);
+  tree.insert(30);
+
+  assert.equal(tree.delete(99), false);
+  assert.equal(tree.size, 3);
+});
+
+// IMPORTANT
+test("maintains AVL balance after deletions", () => {
+  const tree = new AVLTree();
+
+  const values = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45];
+
+  for (const value of values) {
+    tree.insert(value);
+  }
+
+  tree.delete(80);
+  tree.delete(70);
+  tree.delete(60);
+
+  checkAVLBalance(tree.root);
+
+  assert.equal(tree.search(80), null);
+  assert.equal(tree.search(70), null);
+  assert.equal(tree.search(60), null);
+  assert.equal(tree.size, values.length - 3);
+});

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Data Structure Visualizer</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body>
+    <main class="container">
+      <nav class="navigation">
+        <a href="index.html">Home</a>
+        <a href="learn.html">Learn</a>
+        <a href="visualizer.html">Visualizer</a>
+      </nav>
+      <h1>Data Structure Visualizer</h1>
+
+      <p>Interactive visualization of binary search trees, AVL trees and Treaps.</p>
+
+      <section class="controls">
+        <input id="valueInput" type="number" placeholder="Enter a value" />
+
+        <label for="treeType"> Tree Type: </label>
+
+        <select id="treeType">
+          <option value="bst">Binary Search Tree</option>
+          <option value="avl">AVL Tree</option>
+          <option value="treap">Treap</option>
+        </select>
+
+        <button id="insertButton">Insert</button>
+        <button id="searchButton">Search</button>
+        <button id="deleteButton">Delete</button>
+      </section>
+
+      <p id="message"></p>
+
+      <!--
+      This section is only shown when the visualizer is opened
+      from one of the examples on the theory page.
+
+      It compares the normal BST shape with the balanced AVL result.
+      -->
+      <section id="exampleComparison" class="example-comparison hidden">
+        <!-- Tree before AVL balancing is applied. -->
+        <div class="example-tree">
+          <h2>Before balancing</h2>
+          <svg id="beforeTreeCanvas"></svg>
+        </div>
+
+        <!-- Tree after AVL rotations have restored balance. -->
+        <div class="example-tree">
+          <h2>After AVL balancing</h2>
+          <svg id="afterTreeCanvas"></svg>
+        </div>
+      </section>
+
+      <p>Use the controls above to insert, search for, or delete values from the tree below</p>
+
+      <section class="visualizer">
+        <svg id="treeCanvas"></svg>
+      </section>
+
+      <p id="searchLegend" class="search-legend hidden">
+        <strong>Search:</strong>
+        yellow = visited node, green = found value.
+      </p>
+      <!-- this should only appear in search mode-->
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
